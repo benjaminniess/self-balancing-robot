@@ -4,7 +4,6 @@ const board = new five.Board({
   io: new Raspi(),
 })
 
-let gXDelta, gOffsetX, gTotalX
 let lastY = null
 let rotationY
 
@@ -26,10 +25,6 @@ board.on('ready', function () {
 
   accelerometer.on("change", function() {
     update()
-  });
-
-  gyro.on("change", function() {
-
   });
 
   lastY = yRotation()
@@ -61,14 +56,6 @@ board.on('ready', function () {
 
   function toDegrees(angle) {
     return angle * (180 / Math.PI)
-  }
-
-  function xRotation() {
-    let xRotRadiand = Math.atan2(
-      accelerometer.y,
-      distance(accelerometer.x, accelerometer.z),
-    )
-    return toDegrees(xRotRadiand)
   }
 
   function distance(a, b) {
