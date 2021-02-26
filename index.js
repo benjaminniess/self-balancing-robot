@@ -4,10 +4,9 @@ const board = new five.Board({
   io: new Raspi(),
 })
 
-let gTempX, gTempY, gTempZ
 let gXDelta, gOffsetX, gTotalX
-let lastX = null
-let rotationX, rotationY
+let lastY = null
+let rotationY
 
 //#K and K1-- > Constants used with the complementary filter
 const K = 0.98
@@ -33,22 +32,22 @@ board.on('ready', function () {
 
   });
 
-  lastX = xRotation()
-  gOffsetX = gyro.x
-  gTotalX = lastX - gOffsetX
+  lastY = yRotation()
+  gOffsetY = gyro.y
+  gTotalY = lastY - gOffsetY
 
   
   function update() {
-    rotationX = xRotation()
+    rotationY = yRotation()
 
-    gyroX = gyro.x
-    gyroX -= gOffsetX
+    gyroY = gyro.y
+    gyroY -= gOffsetY
 
-    gXDelta = gyroX * timeDiff
+    gYDelta = gyroY * timeDiff
     
-    lastX = K * (lastX + gXDelta) + K1 * rotationX
+    lastY = K * (lastY + gYDelta) + K1 * rotationY
 
-    console.log(lastX);
+    console.log(lastY);
   }
 
 
