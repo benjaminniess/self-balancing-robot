@@ -25,21 +25,32 @@ board.on('ready', function () {
     // sensitivity: 16384 // optional
   })
 
+  accelerometer.on("change", function() {
+    update()
+  });
+
+  gyro.on("change", function() {
+
+  });
+
   lastX = xRotation()
   gOffsetX = gyro.x
   gTotalX = lastX - gOffsetX
 
-  while (true) {
+  
+  function update() {
     rotationX = xRotation()
 
     gyroX = gyro.x
     gyroX -= gOffsetX
 
     gXDelta = gyroX * timeDiff
-
-    console.log(lastX, gXDelta, rotationX)
+    
     lastX = K * (lastX + gXDelta) + K1 * rotationX
+
+    console.log(lastX);
   }
+
 
   function yRotation() {
     let yRotRadiand = Math.atan2(
