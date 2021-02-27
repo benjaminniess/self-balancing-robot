@@ -28,10 +28,36 @@ board.on('ready', function () {
     setTimeout(update, 1000);
   });
 
+  
+  const motor1a = new five.Motor('GPIO10');
+  const motor1b = new five.Motor('GPIO9')
+  const motor2a = new five.Motor('GPIO8');
+  const motor2b = new five.Motor('GPIO7')
+
+  function moveForward(value = 255) {
+    motor1a.start(value)
+    motor1b.stop();
+    motor2a.start(value)
+    motor2b.stop();
+  }
+  function moveBackward(value = 255) { 
+    motor1b.start(value)
+    motor1a.stop();
+    motor2b.start(value)
+    motor2a.stop();
+  }
+
+  function stop() { 
+    motor1a.stop()
+    motor1b.stop();
+    motor2a.stop()
+    motor2b.stop();
+  }
+
   lastY = yRotation()
   gOffsetY = gyro.y
   gTotalY = lastY - gOffsetY
-
+ 
   
   function update() {
     let currentTime = new Date().getTime()
@@ -46,7 +72,12 @@ board.on('ready', function () {
     
     lastY = K * (lastY + gYDelta) + K1 * rotationY
 
-    console.log(lastY, PID.step(lastY) )
+//    console.log(lastY, PID.step(lastY) )
+    if (lastY < 0 ) {
+      moveForward(50)
+    } else {
+      moveBackward(100)
+    }    
   }
 
 
