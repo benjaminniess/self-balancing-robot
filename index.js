@@ -3,14 +3,15 @@ const Raspi = require('raspi-io').RaspiIO
 const board = new five.Board({
   io: new Raspi(),
 })
-
+const PIDController = require('./pid-controller.js')
 let lastY = null
 let rotationY
+let lastTimestamp = new Date().getTime()
 
 //#K and K1-- > Constants used with the complementary filter
 const K = 0.98
 const K1 = 1 - K
-const timeDiff = 0.02
+const PID = new PIDController( -78.5, 1.0, 1.0);
 
 board.on('ready', function () {
   let gyro = new five.Gyro({
@@ -24,7 +25,7 @@ board.on('ready', function () {
   })
 
   accelerometer.on("change", function() {
-    update()
+    setTimeout(update, 1000);
   });
 
   lastY = yRotation()
@@ -33,6 +34,9 @@ board.on('ready', function () {
 
   
   function update() {
+    let currentTime = new Date().getTime()
+    let timeDiff = ( currentTime - lastTimestamp ) / 100
+    lastTimestamp = currentTime
     rotationY = yRotation()
 
     gyroY = gyro.y
@@ -42,7 +46,7 @@ board.on('ready', function () {
     
     lastY = K * (lastY + gYDelta) + K1 * rotationY
 
-    console.log(lastY);
+    console.log(lastY, PID.step(lastY) )
   }
 
 
