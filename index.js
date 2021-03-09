@@ -1,3 +1,6 @@
+const app = require('express')()
+const http = require('http').createServer(app)
+
 const five = require('johnny-five')
 const Raspi = require('raspi-io').RaspiIO
 const board = new five.Board({
@@ -21,6 +24,18 @@ const iValue = argv.i ? argv.i : 0
 const dValue = argv.d ? argv.d : 0
 const PID = new PIDController(-pValue, iValue, dValue, balanceValue)
 
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/html/index.html')
+})
+
+app.get('/html/*', (req, res) => {
+  res.sendFile(__dirname + '/html/' + req.params[0])
+})
+
+http.listen(3000, () => {
+  console.log('listening on *:3000')
+})
+
 board.on('ready', function () {
   let gyro = new five.Gyro({
     controller: 'MPU6050',
@@ -33,7 +48,7 @@ board.on('ready', function () {
   })
 
   accelerometer.on('change', function () {
-    update()
+    //update()
   })
 
   const motor1a = new five.Motor('GPIO10')

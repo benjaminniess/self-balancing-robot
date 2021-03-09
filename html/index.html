@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="html/css/uikit.min.css" />
+    <script src="html/js/uikit.min.js"></script>
+    <script src="html/js/uikit-icons.min.js"></script>
+  </head>
+  <body>
+    <div class="uk-section uk-section-primary">
+      <div class="uk-container uk-container-xsmall">
+        <form>
+          <input class="uk-checkbox" id="engines-start" type="checkbox" />
+          <label for="engines-start">Engines start</label>
+
+          <br />
+          <label for="balanceVal">Balance value</label>
+          <input
+            id="balanceVal"
+            type="number"
+            min="-10"
+            max="10"
+            value="0"
+            step="0.1"
+          />
+
+          <br />
+          <label for="pVal">P value</label>
+          <input id="pVal" type="number" min="0" max="120" value="70" />
+
+          <br />
+          <label for="pVal">I value</label>
+          <input id="iVal" type="number" min="-50" max="50" value="0" />
+
+          <br />
+          <label for="pVal">D value</label>
+          <input id="dVal" type="number" min="0" max="120" value="0" />
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
