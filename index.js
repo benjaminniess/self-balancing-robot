@@ -1,11 +1,18 @@
 const app = require('express')()
 const http = require('http').createServer(app)
+const io = require('socket.io')(http)
 
 const five = require('johnny-five')
 const Raspi = require('raspi-io').RaspiIO
 const board = new five.Board({
   io: new Raspi(),
 })
+
+const motor1a = new five.Motor('GPIO10')
+const motor1b = new five.Motor('GPIO9')
+const motor2a = new five.Motor('GPIO8')
+const motor2b = new five.Motor('GPIO7')
+
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
 const argv = yargs(hideBin(process.argv)).argv
@@ -22,7 +29,8 @@ const balanceValue = argv.balanceValue ? argv.balanceValue : 0
 const pValue = argv.p ? argv.p : 0
 const iValue = argv.i ? argv.i : 0
 const dValue = argv.d ? argv.d : 0
-const PID = new PIDController(-pValue, iValue, dValue, balanceValue)
+const PID = new PIDController(pValue, iValue, dValue, balanceValue)
+let engineStart = false
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/html/index.html')
@@ -32,9 +40,63 @@ app.get('/html/*', (req, res) => {
   res.sendFile(__dirname + '/html/' + req.params[0])
 })
 
+io.on('connection', (socket) => {
+  socket.on('paramUpdate', (socketVal) => {
+    switch (socketVal.param) {
+      case 'engineSwitch':
+        engineStart = socketVal.value === true ? true : false
+        if (engineStart === false) {
+          stop()
+        }
+        break
+      case 'balanceValue':
+        PID.setTarget(parseFloat(socketVal.value))
+        break
+      case 'pVal':
+        PID.setP(parseFloat(socketVal.value))
+        break
+      case 'iVal':
+        PID.setI(parseFloat(socketVal.value))
+        break
+      case 'dVal':
+        PID.setD(parseFloat(socketVal.value))
+        break
+      default:
+        break
+    }
+  })
+})
+
 http.listen(3000, () => {
   console.log('listening on *:3000')
 })
+
+function moveBackward(value = 255) {
+  if (engineStart === true) {
+    console.log('back ' + value)
+    motor1a.start(value)
+    motor1b.stop()
+    motor2a.start(value)
+    motor2a.start()
+    motor2b.stop()
+  }
+}
+function moveForward(value = 255) {
+  if (engineStart === true) {
+    console.log('fo ' + value)
+    motor1b.start(value)
+    motor1a.stop()
+    motor2b.start(value)
+    motor2a.stop()
+  }
+}
+
+function stop() {
+  motor1a.stop()
+  motor1b.stop()
+  motor2a.stop()
+  motor2b.stop()
+}
 
 board.on('ready', function () {
   let gyro = new five.Gyro({
@@ -48,36 +110,8 @@ board.on('ready', function () {
   })
 
   accelerometer.on('change', function () {
-    //update()
+    update()
   })
-
-  const motor1a = new five.Motor('GPIO10')
-  const motor1b = new five.Motor('GPIO9')
-  const motor2a = new five.Motor('GPIO8')
-  const motor2b = new five.Motor('GPIO7')
-
-  function moveBackward(value = 255) {
-    console.log('back ' + value)
-    motor1a.start(value)
-    motor1b.stop()
-    motor2a.start(value)
-    motor2a.start()
-    motor2b.stop()
-  }
-  function moveForward(value = 255) {
-    console.log('fo ' + value)
-    motor1b.start(value)
-    motor1a.stop()
-    motor2b.start(value)
-    motor2a.stop()
-  }
-
-  function stop() {
-    motor1a.stop()
-    motor1b.stop()
-    motor2a.stop()
-    motor2b.stop()
-  }
 
   lastY = 0
 

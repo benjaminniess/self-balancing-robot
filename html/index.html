@@ -7,12 +7,19 @@
     <link rel="stylesheet" href="html/css/uikit.min.css" />
     <script src="html/js/uikit.min.js"></script>
     <script src="html/js/uikit-icons.min.js"></script>
+    <script src="html/js/socket.io.js"></script>
   </head>
   <body>
     <div class="uk-section uk-section-primary">
       <div class="uk-container uk-container-xsmall">
         <form>
-          <input class="uk-checkbox" id="engines-start" type="checkbox" />
+          <input
+            class="uk-checkbox"
+            id="engines-start"
+            type="checkbox"
+            name="engines-start"
+            value="1"
+          />
           <label for="engines-start">Engines start</label>
 
           <br />
@@ -40,5 +47,6 @@
         </form>
       </div>
     </div>
+    <script src="html/js/main.js"></script>
   </body>
 </html>
