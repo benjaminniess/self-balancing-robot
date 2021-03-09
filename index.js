@@ -3,15 +3,23 @@ const Raspi = require('raspi-io').RaspiIO
 const board = new five.Board({
   io: new Raspi(),
 })
+const yargs = require('yargs/yargs')
+const { hideBin } = require('yargs/helpers')
+const argv = yargs(hideBin(process.argv)).argv
+
 const PIDController = require('./pid-controller.js')
 let lastY = null
 let rotationY
-let lastTimestamp = new Date().getTime()
+let lastTimestamp = 0
 
 //#K and K1-- > Constants used with the complementary filter
 const K = 0.98
 const K1 = 1 - K
-const PID = new PIDController( -78.5, 1.0, 1.0);
+const balanceValue = argv.balanceValue ? argv.balanceValue : 0
+const pValue = argv.p ? argv.p : 0
+const iValue = argv.i ? argv.i : 0
+const dValue = argv.d ? argv.d : 0
+const PID = new PIDController(-pValue, iValue, dValue, balanceValue)
 
 board.on('ready', function () {
   let gyro = new five.Gyro({
@@ -24,69 +32,71 @@ board.on('ready', function () {
     // sensitivity: 16384 // optional
   })
 
-  accelerometer.on("change", function() {
-    setTimeout(update, 1000);
-  });
+  accelerometer.on('change', function () {
+    update()
+  })
 
-  
-  const motor1a = new five.Motor('GPIO10');
+  const motor1a = new five.Motor('GPIO10')
   const motor1b = new five.Motor('GPIO9')
-  const motor2a = new five.Motor('GPIO8');
+  const motor2a = new five.Motor('GPIO8')
   const motor2b = new five.Motor('GPIO7')
 
-  function moveForward(value = 255) {
+  function moveBackward(value = 255) {
+    console.log('back ' + value)
     motor1a.start(value)
-    motor1b.stop();
+    motor1b.stop()
     motor2a.start(value)
-    motor2b.stop();
+    motor2a.start()
+    motor2b.stop()
   }
-  function moveBackward(value = 255) { 
+  function moveForward(value = 255) {
+    console.log('fo ' + value)
     motor1b.start(value)
-    motor1a.stop();
-    motor2b.start(value)
-    motor2a.stop();
-  }
-
-  function stop() { 
     motor1a.stop()
-    motor1b.stop();
+    motor2b.start(value)
     motor2a.stop()
-    motor2b.stop();
   }
 
-  lastY = yRotation()
-  gOffsetY = gyro.y
-  gTotalY = lastY - gOffsetY
- 
-  
+  function stop() {
+    motor1a.stop()
+    motor1b.stop()
+    motor2a.stop()
+    motor2b.stop()
+  }
+
+  lastY = 0
+
   function update() {
-    let currentTime = new Date().getTime()
-    let timeDiff = ( currentTime - lastTimestamp ) / 100
-    lastTimestamp = currentTime
-    rotationY = yRotation()
+    let currentTime = new Date().getTime() / 1000
+    let timeDiff = currentTime - lastTimestamp
+    if (timeDiff > 0.02) {
+      lastTimestamp = currentTime
+      rotationY = yRotation()
 
-    gyroY = gyro.y
-    gyroY -= gOffsetY
+      gyroY = gyro.rate.y
+      if (gyroY > 0 && gyroY < 1) {
+        gyroY = 0
+      } else if (gyroY < 0 && gyroY > -1) {
+        gyroY = 0
+      }
+      gYDelta = gyroY * timeDiff
 
-    gYDelta = gyroY * timeDiff
-    
-    lastY = K * (lastY + gYDelta) + K1 * rotationY
-
-//    console.log(lastY, PID.step(lastY) )
-    if (lastY < 0 ) {
-      moveForward(50)
-    } else {
-      moveBackward(100)
-    }    
+      lastY = K * (lastY - gYDelta) + K1 * rotationY
+      let newVal = PID.step(lastY)
+      if (newVal < 0) {
+        moveBackward(-newVal)
+      } else {
+        moveForward(newVal)
+      }
+    }
   }
-
 
   function yRotation() {
     let yRotRadiand = Math.atan2(
       accelerometer.x,
       distance(accelerometer.y, accelerometer.z),
     )
-    return -toDegrees(yRotRadiand)
+    return toDegrees(yRotRadiand)
   }
 
   function toDegrees(angle) {
