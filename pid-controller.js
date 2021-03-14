@@ -42,15 +42,12 @@ class PIDController {
     this.lastError = error
     this.integrator += error
 
-    // console.log('ERR: ' + error)
-    //console.log(this.integrator)
-    //console.log('KP : ' + -this.KP * error)
-    console.log('KI' + this.KI * this.integrator)
     return {
       result: output,
       P: P,
       I: I,
       D: D,
+      angle: error,
     }
   }
 }

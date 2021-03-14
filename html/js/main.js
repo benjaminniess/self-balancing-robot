@@ -1,16 +1,46 @@
-var socket = io()
+const socket = io()
 
-var enginesStart = document.getElementById('engines-start')
-var balanceValue = document.getElementById('balanceVal')
-var pVal = document.getElementById('pVal')
-var iVal = document.getElementById('iVal')
-var dVal = document.getElementById('dVal')
+let enginesStart = document.getElementById('engines-start')
+let balanceValue = document.getElementById('balanceVal')
+let pVal = document.getElementById('pVal')
+let iVal = document.getElementById('iVal')
+let dVal = document.getElementById('dVal')
 
-var pFeedbackVal = document.getElementById('pFeedbackValue')
-var iFeedbackVal = document.getElementById('iFeedbackValue')
-var dFeedbackVal = document.getElementById('dFeedbackValue')
-var resultFeedbackVal = document.getElementById('resultFeedbackValue')
-var resetLink = document.getElementById('reset')
+let pFeedbackVal = document.getElementById('pFeedbackValue')
+let iFeedbackVal = document.getElementById('iFeedbackValue')
+let dFeedbackVal = document.getElementById('dFeedbackValue')
+let resultFeedbackVal = document.getElementById('resultFeedbackValue')
+let resetLink = document.getElementById('reset')
+let currentAngle = document.getElementById('currentAngle')
+
+let target = document.getElementById('gaugeCanevas')
+let gauge = new Gauge(target).setOptions({
+  angle: 0, // The span of the gauge arc
+  lineWidth: 0.27, // The line thickness
+  radiusScale: 1, // Relative radius
+  pointer: {
+    length: 0.6, // // Relative to gauge radius
+    strokeWidth: 0.035, // The thickness
+    color: '#000000', // Fill color
+  },
+  animationSpeed: 10,
+  strokeColor: '#E0E0E0', // to see which ones work best for you
+  generateGradient: true,
+  highDpiSupport: true, // High resolution support
+  staticZones: [
+    { strokeStyle: '#F03E3E', min: -45, max: -15 }, // Red from 100 to 130
+    { strokeStyle: '#FFDD00', min: -15, max: -10 }, // Yellow
+    { strokeStyle: '#30B32D', min: -10, max: 10 }, // Green
+    { strokeStyle: '#FFDD00', min: 10, max: 15 }, // Yellow
+    { strokeStyle: '#F03E3E', min: 15, max: 45 }, // Red
+  ],
+})
+
+// Does not work in the declaration for some reason
+gauge.maxValue = 45
+gauge.minValue = -45
+gauge.setTextField(currentAngle)
+gauge.set(0)
 
 enginesStart.addEventListener('change', function (e) {
   e.preventDefault()
@@ -64,4 +94,5 @@ socket.on('PID', (PIDData) => {
   iFeedbackVal.innerHTML = Math.round(PIDData.I * 100) / 100
   dFeedbackVal.innerHTML = Math.round(PIDData.D * 100) / 100
   resultFeedbackVal.innerHTML = Math.round(PIDData.result * 100) / 100
+  gauge.set(PIDData.angle)
 })
