@@ -28,17 +28,17 @@ let gauge = new Gauge(target).setOptions({
   generateGradient: true,
   highDpiSupport: true, // High resolution support
   staticZones: [
-    { strokeStyle: '#F03E3E', min: -45, max: -15 }, // Red from 100 to 130
-    { strokeStyle: '#FFDD00', min: -15, max: -10 }, // Yellow
+    { strokeStyle: '#F03E3E', min: -90, max: -20 }, // Red from 100 to 130
+    { strokeStyle: '#FFDD00', min: -20, max: -10 }, // Yellow
     { strokeStyle: '#30B32D', min: -10, max: 10 }, // Green
-    { strokeStyle: '#FFDD00', min: 10, max: 15 }, // Yellow
-    { strokeStyle: '#F03E3E', min: 15, max: 45 }, // Red
+    { strokeStyle: '#FFDD00', min: 10, max: 20 }, // Yellow
+    { strokeStyle: '#F03E3E', min: 20, max: 90 }, // Red
   ],
 })
 
 // Does not work in the declaration for some reason
-gauge.maxValue = 45
-gauge.minValue = -45
+gauge.maxValue = 90
+gauge.minValue = -90
 gauge.setTextField(currentAngle)
 gauge.set(0)
 
