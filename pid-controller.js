@@ -11,6 +11,7 @@ class PIDController {
 
   setTarget(bVal) {
     this.target = bVal
+    this.integrator = 0
   }
 
   setP(val) {
@@ -25,16 +26,32 @@ class PIDController {
     this.KD = val
   }
 
+  resetError() {
+    this.integrator = 0
+  }
+
   step(currentValue) {
     let error = currentValue - this.target
-    let output =
-      -this.KP * error +
-      this.KI * this.integrator +
-      this.KD * (error - this.lastError)
+
+    let P = -this.KP * error
+    let I = this.KI * this.integrator
+    let D = this.KD * (error - this.lastError)
+
+    let output = P + +I + D
+
     this.lastError = error
     this.integrator += error
 
-    return output
+    // console.log('ERR: ' + error)
+    //console.log(this.integrator)
+    //console.log('KP : ' + -this.KP * error)
+    console.log('KI' + this.KI * this.integrator)
+    return {
+      result: output,
+      P: P,
+      I: I,
+      D: D,
+    }
   }
 }
 module.exports = PIDController

@@ -12,6 +12,7 @@
   <body>
     <div class="uk-section uk-section-primary">
       <div class="uk-container uk-container-xsmall">
+        <h2 class="uk-heading-medium">Settings</h2>
         <form>
           <input
             class="uk-checkbox"
@@ -35,16 +36,36 @@
 
           <br />
           <label for="pVal">P value</label>
-          <input id="pVal" type="number" min="0" max="120" value="70" />
+          <input id="pVal" type="number" value="70" />
 
           <br />
           <label for="pVal">I value</label>
-          <input id="iVal" type="number" min="-50" max="50" value="0" />
+          <input id="iVal" type="number" value="0" />
 
           <br />
           <label for="pVal">D value</label>
-          <input id="dVal" type="number" min="0" max="120" value="0" />
+          <input id="dVal" type="number" value="0" />
+
+          <p><a href="#" id="reset">Reset</a></p>
         </form>
+
+        <h2 class="uk-heading-medium">PID feedback</h2>
+        <h4>
+          P:
+          <span id="pFeedbackValue">0</span>
+        </h4>
+        <h4>
+          I:
+          <span id="iFeedbackValue">0</span>
+        </h4>
+        <h4>
+          D:
+          <span id="dFeedbackValue">0</span>
+        </h4>
+        <h4>
+          Result:
+          <span id="resultFeedbackValue">0</span>
+        </h4>
       </div>
     </div>
     <script src="html/js/main.js"></script>

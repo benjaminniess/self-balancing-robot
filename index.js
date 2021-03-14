@@ -61,6 +61,9 @@ io.on('connection', (socket) => {
       case 'dVal':
         PID.setD(parseFloat(socketVal.value))
         break
+      case 'reset':
+        PID.resetError()
+        break
       default:
         break
     }
@@ -131,7 +134,11 @@ board.on('ready', function () {
       gYDelta = gyroY * timeDiff
 
       lastY = K * (lastY - gYDelta) + K1 * rotationY
-      let newVal = PID.step(lastY)
+      let PIDData = PID.step(lastY)
+      let newVal = PIDData.result
+
+      io.emit('PID', PIDData)
+
       if (newVal < 0) {
         moveBackward(-newVal)
       } else {
