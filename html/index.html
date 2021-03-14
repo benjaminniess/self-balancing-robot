@@ -9,6 +9,7 @@
     <script src="html/js/uikit-icons.min.js"></script>
     <script src="html/js/socket.io.js"></script>
     <script src="html/js/dist/gauge.js"></script>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
   </head>
   <body>
     <div class="uk-section uk-section-primary">
@@ -51,24 +52,10 @@
         </form>
 
         <h2 class="uk-heading-medium">PID feedback</h2>
-        <h4>
-          P:
-          <span id="pFeedbackValue">0</span>
-        </h4>
-        <h4>
-          I:
-          <span id="iFeedbackValue">0</span>
-        </h4>
-        <h4>
-          D:
-          <span id="dFeedbackValue">0</span>
-        </h4>
-        <h4>
-          Result:
-          <span id="resultFeedbackValue">0</span>
-        </h4>
-        <div id="currentAngle" class="preview-textfield"></div>
+
         <canvas id="gaugeCanevas"></canvas>
+
+        <div id="chartContainer" style="height: 370px; width: 100;"></div>
       </div>
     </div>
     <script src="html/js/main.js"></script>

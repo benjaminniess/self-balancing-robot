@@ -6,12 +6,8 @@ let pVal = document.getElementById('pVal')
 let iVal = document.getElementById('iVal')
 let dVal = document.getElementById('dVal')
 
-let pFeedbackVal = document.getElementById('pFeedbackValue')
-let iFeedbackVal = document.getElementById('iFeedbackValue')
-let dFeedbackVal = document.getElementById('dFeedbackValue')
 let resultFeedbackVal = document.getElementById('resultFeedbackValue')
 let resetLink = document.getElementById('reset')
-let currentAngle = document.getElementById('currentAngle')
 
 let target = document.getElementById('gaugeCanevas')
 let gauge = new Gauge(target).setOptions({
@@ -39,7 +35,6 @@ let gauge = new Gauge(target).setOptions({
 // Does not work in the declaration for some reason
 gauge.maxValue = 90
 gauge.minValue = -90
-gauge.setTextField(currentAngle)
 gauge.set(0)
 
 enginesStart.addEventListener('change', function (e) {
@@ -90,9 +85,45 @@ resetLink.addEventListener('click', (e) => {
 })
 
 socket.on('PID', (PIDData) => {
-  pFeedbackVal.innerHTML = Math.round(PIDData.P * 100) / 100
-  iFeedbackVal.innerHTML = Math.round(PIDData.I * 100) / 100
-  dFeedbackVal.innerHTML = Math.round(PIDData.D * 100) / 100
-  resultFeedbackVal.innerHTML = Math.round(PIDData.result * 100) / 100
+  let roundedP = Math.round(PIDData.P * 100) / 100
+  let roundedI = Math.round(PIDData.I * 100) / 100
+  let roundedD = Math.round(PIDData.D * 100) / 100
+  let roundedResult = Math.round(PIDData.result * 100) / 100
+
   gauge.set(PIDData.angle)
+
+  chart.options.data[0].dataPoints[0].y = PIDData.angle
+  chart.options.data[0].dataPoints[1].y = roundedP
+  chart.options.data[0].dataPoints[2].y = roundedI
+  chart.options.data[0].dataPoints[3].y = roundedD
+  chart.options.data[0].dataPoints[4].y = roundedResult
+
+  chart.render()
+})
+
+let chart = new CanvasJS.Chart('chartContainer', {
+  title: {
+    text: 'PID feedback',
+  },
+  axisY: {
+    title: 'Absolute value',
+    includeZero: true,
+    suffix: '',
+    maximum: 255,
+    minimum: -255,
+  },
+  data: [
+    {
+      type: 'column',
+      yValueFormatString: '#,###',
+      indexLabel: '{y}',
+      dataPoints: [
+        { label: 'Angle error', y: 0 },
+        { label: 'KP * error', y: 0 },
+        { label: 'KI * (sum of errors)', y: 0 },
+        { label: 'KD * (error - previous error)', y: 0 },
+        { label: 'Motors speed', y: 0 },
+      ],
+    },
+  ],
 })

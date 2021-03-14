@@ -37,10 +37,23 @@ class PIDController {
     let I = this.KI * this.integrator
     let D = this.KD * (error - this.lastError)
 
+    P = P > 255 ? 255 : P
+    P = P < -255 ? -255 : P
+    I = I > 255 ? 255 : I
+    I = I < -255 ? -255 : I
+    D = D > 255 ? 255 : D
+    D = D < -255 ? -255 : D
+
     let output = P + +I + D
 
     this.lastError = error
+
     this.integrator += error
+    if (this.integrator >= 255) {
+      this.integrator = 255
+    } else if (this.integrator < -255) {
+      this.integrator = -255
+    }
 
     return {
       result: output,
